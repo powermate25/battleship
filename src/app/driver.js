@@ -39,10 +39,23 @@ function createGraphBfs(x = 5) {
 class GameBoard {
     constructor(gridNum) {
         this.board = createGraphBfs(gridNum)
+        this.boardLimit = gridNum - 1
         this.occupiedPositions = []
         this.missedShots = []
         this.successfulShots = []
-        this.boardLimit = gridNum - 1
+        this.alertMessage = undefined
+        this.fleetLength = this.getFleetLength()
+        
+    }
+    
+    getFleetLength() {
+        const fleet = this.occupiedPositions
+        const result = fleet.reduce( (acc, curr) => {
+            clog(acc)
+            return acc + curr.length-1
+        }, 0)
+        clog(result)
+        return result
     }
 
     placeShip(ship, posX, dir ) {
@@ -59,7 +72,7 @@ class GameBoard {
 
             posY.forEach(i => {
                 if(i === false) {
-                    confirm("🚨 PositionY out of range! \nContinue?")
+                    confirm("🚨 Dev alert: PositionY out of range! \nContinue?")
                 }
             })
             return posY
@@ -67,7 +80,7 @@ class GameBoard {
 
         const length = ship.length
         if(length > limit || length < 0) {
-            throw new Error(`Maximum ship size is ${limit}`)
+            throw new Error(`Ship too large. Max length is ${limit}`)
         }
 
         function defaultShipDir() {
@@ -82,12 +95,12 @@ class GameBoard {
         ? [posX[0], posX[1] - (length-1) ]
         : dir === "h+"
         ? [posX[0], posX[1] + (length-1) ]
-        : !dir? defaultShipDir()
+        : !dir ? defaultShipDir()
         : new Error("Forgot ship direction parameter?")
         clog(posX)
         clog( checkPosition(posY) )
 
-        //Assuming good position provided
+        //Assuming good (in range) position provided
         const temp = []
         function SetOccupiedPositions() {
             if (posY[1] < posX[1]) {
@@ -104,13 +117,13 @@ class GameBoard {
         }
         SetOccupiedPositions()
         this.occupiedPositions.push(temp)
-        // clog(this.occupiedPositions)
+        this.fleetLength = this.getFleetLength()
     }
 
     receiveAttack(coordinate) {
         const occupations = this.occupiedPositions
-        clog(occupations[0].length)
         let weBeenHit = false
+        let shipId = undefined
         for (let index in occupations) {
             const curr = occupations[index]
             for (let i = 0; i <= curr.length-2; i++) {
@@ -118,52 +131,99 @@ class GameBoard {
                 const target = coordinate.toString()
                 if(currI === target) {
                     weBeenHit = true
-                    playerShip.hit(currI)
+                    shipId = curr[curr.length-1]
+                    clog("🔔")
+                    clog(shipId)
                     break
                 }
             }
         }
-        this.attackReport(coordinate, weBeenHit)
-    
+        this.attackReport(coordinate, weBeenHit, shipId)
     }
 
+    sendAttack(coordinate) {
+        const isDuplicate = this.missedShots
+        .concat(this.successfulShots)
+        .some(i => {
+            return i.toString() === coordinate.toString()
+        })
+        clog(isDuplicate)
+        if (isDuplicate) {
+            confirm("Dev info: can't shot same area twice!")
+            return
+        }
+
+        opGameBoard.receiveAttack(coordinate)
+        const successAlert = "Nice shot! they're hit and struggling! 🎉"
+        const failureAlert = "Missed! We're going to sink first at this rate! 😭" 
+        const attackResult = this.alertMessage
+        if ( attackResult ) { clog(successAlert) }
+        else { clog(failureAlert) }
+    }
     // Next step: 
     // sendAttack method. constructor(coor, ship) 
     // or also make sense integrating board into each player
 
-    attackReport(coordinate, report) {
+    attackReport(coordinate, report, shipId) {
             if (report) {
+                shipId.hit()
                 clog("🚨 Too bad, we've been hit!")
-                this.successfulShots.push(coordinate)
+                // Report to attack result to attacker
+                opGameBoard.successfulShots.push(coordinate)
+                opGameBoard.alertMessage = true
+            }
+            if ( this.hits >= this.fleetLength ) {
+                clog("🤕 Hell, we lost! Our last ship just gone!")
+                confirm("🔔 Dev info: Game should be over now.")
             }
             else if (!report) {
                 clog("📢 They're blind! Now our chance!")
-                this.missedShots.push(coordinate)
+                // Report to attack result to attacker
+                opGameBoard.missedShots.push(coordinate)
+                opGameBoard.alertMessage = false
             }
+            
+             
+
             clog("🔔 Board summary below: ")
             clog(this)
         }
 }
 
-
-/* for (let index in occupations) {
-            const curr = occupations[index]
-            for (let i = 0; i < curr.length; i++) {
-                
-            }
-        } */
-
+class Player {
+    constructor(name, playerType, shipNumber = 5) {
+        this.name = name
+        this.type = playerType
+        this.gameBoard = new GameBoard(10)
+        this.battleShips = new Array(shipNumber)
+    }
+}
 
 
 // Logs
-const playerShip = new Ship(4)
+const player1 = new Player("Jack", "human")
+const player2 = new Player("Rose", "cpu")
+clog(player1)
+clog(player2)
+const demoShip = new Ship(4)
 const gameBoard = new GameBoard(10)
-clog(playerShip)
+const opShip = new Ship(3)
+const opGameBoard = new GameBoard(10)
+
+
+clog( gameBoard.placeShip(demoShip, [5, 3], "h+") )
+clog( gameBoard.placeShip(demoShip, [3, 4], "h-") )
+//clog(gameBoard.sendAttack([0, 3]))
+// clog(gameBoard.sendAttack([3, 3]))
+// clog(gameBoard.receiveAttack([5, 3]))
+
+//clog( opGameBoard.placeShip(opShip, [3, 3], "h+") )
+//clog( opGameBoard.placeShip(opShip, [1, 7], "h-") )
+
+clog(demoShip)
 clog(gameBoard)
-clog( gameBoard.placeShip(playerShip, [5, 3], "h+") )
-clog( gameBoard.placeShip(playerShip, [3, 4], "h-") )
-clog(gameBoard.receiveAttack([0, 3]))
-clog(gameBoard.receiveAttack([5, 3]))
-clog(playerShip)
+// clog(opShip)
+//clog(opGameBoard)
+
 // Exports
 export { Ship, createGraphBfs, GameBoard }
