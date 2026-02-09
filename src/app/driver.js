@@ -153,7 +153,9 @@ class GameBoard {
             return
         }
 
-        opGameBoard.receiveAttack(coordinate)
+        //if two players P1 & P2: 
+        // P1.op should be P2 and vice versa
+        this.op.gameBoard.receiveAttack(coordinate)
         const successAlert = "Nice shot! they're hit and struggling! 🎉"
         const failureAlert = "Missed! We're going to sink first at this rate! 😭" 
         const attackResult = this.alertMessage
@@ -169,8 +171,8 @@ class GameBoard {
                 shipId.hit()
                 clog("🚨 Too bad, we've been hit!")
                 // Report to attack result to attacker
-                opGameBoard.successfulShots.push(coordinate)
-                opGameBoard.alertMessage = true
+                this.op.gameBoard.successfulShots.push(coordinate)
+                this.op.gameBoard.alertMessage = true
             }
             if ( this.hits >= this.fleetLength ) {
                 clog("🤕 Hell, we lost! Our last ship just gone!")
@@ -179,8 +181,8 @@ class GameBoard {
             else if (!report) {
                 clog("📢 They're blind! Now our chance!")
                 // Report to attack result to attacker
-                opGameBoard.missedShots.push(coordinate)
-                opGameBoard.alertMessage = false
+                this.op.gameBoard.missedShots.push(coordinate)
+                this.op.gameBoard.alertMessage = false
             }
             
             clog("🔔 Board summary below: ")
