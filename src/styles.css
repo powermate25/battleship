@@ -7,3 +7,12 @@ body {
 * {
     box-sizing: border-box; 
 }
+
+.gameboard {
+    border: 1px solid green;
+    width: 36vw;
+    height:calc(36vw);
+    display: grid;
+    grid-template-columns: repeat(10, calc(36vw/10) );
+    grid-template-rows: repeat(10, calc(36vw/10) );
+}

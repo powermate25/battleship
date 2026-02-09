@@ -50,8 +50,8 @@ class GameBoard {
     
     getFleetLength() {
         const fleet = this.occupiedPositions
-        const result = fleet.reduce( (acc, curr) => {
-            clog(acc)
+        const result = fleet
+        .reduce( (acc, curr) => {
             return acc + curr.length-1
         }, 0)
         clog(result)
@@ -183,8 +183,6 @@ class GameBoard {
                 opGameBoard.alertMessage = false
             }
             
-             
-
             clog("🔔 Board summary below: ")
             clog(this)
         }
@@ -203,27 +201,16 @@ class Player {
 // Logs
 const player1 = new Player("Jack", "human")
 const player2 = new Player("Rose", "cpu")
-clog(player1)
-clog(player2)
+
 const demoShip = new Ship(4)
 const gameBoard = new GameBoard(10)
-const opShip = new Ship(3)
-const opGameBoard = new GameBoard(10)
 
-
-clog( gameBoard.placeShip(demoShip, [5, 3], "h+") )
-clog( gameBoard.placeShip(demoShip, [3, 4], "h-") )
-//clog(gameBoard.sendAttack([0, 3]))
-// clog(gameBoard.sendAttack([3, 3]))
-// clog(gameBoard.receiveAttack([5, 3]))
-
-//clog( opGameBoard.placeShip(opShip, [3, 3], "h+") )
-//clog( opGameBoard.placeShip(opShip, [1, 7], "h-") )
-
+gameBoard.placeShip(demoShip, [5, 3], "h+")
+gameBoard.placeShip(demoShip, [3, 4], "h-")
 clog(demoShip)
 clog(gameBoard)
 // clog(opShip)
 //clog(opGameBoard)
 
 // Exports
-export { Ship, createGraphBfs, GameBoard }
+export { clog, Ship, createGraphBfs, GameBoard, Player }
