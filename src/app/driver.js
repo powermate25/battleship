@@ -2,6 +2,20 @@ const clog = console.log
 clog("Battleship")
 
 // Code
+function createGraphBfs(x = 5) {
+    x = x - 1
+    const cells = []
+    for (let i = 0; i <= x; i++) {
+        function buildCells(num) {
+            for(let id = 0; id <= num; id++) {
+                cells.push([i, id])
+            }
+        }
+        buildCells(x)
+    }
+    return cells
+}
+
 class Ship {
     constructor(shipLength) {
         this.ship = new Array(shipLength)
@@ -22,20 +36,6 @@ class Ship {
     }
 }
 
-function createGraphBfs(x = 5) {
-    x = x - 1
-    const cells = []
-    for (let i = 0; i <= x; i++) {
-        function buildCells(num) {
-            for(let id = 0; id <= num; id++) {
-                cells.push([i, id])
-            }
-        }
-        buildCells(x)
-    }
-    return cells
-}
-
 class GameBoard {
     constructor(gridNum) {
         this.board = createGraphBfs(gridNum)
@@ -44,7 +44,8 @@ class GameBoard {
         this.missedShots = []
         this.successfulShots = []
         this.alertMessage = undefined
-        this.fleetLength = this.getFleetLength()
+        this.fleetLength = 0
+        // this.fleetLength = this.getFleetLength()
         
     }
     
@@ -84,18 +85,17 @@ class GameBoard {
         }
 
         function defaultShipDir() {
-            clog("PosY set to default horizontal+")
-            return [posX[0], posX[1] + (length-1) ]
+            clog("Ship direction invalid!")
+            return [posX[0], posX[1]]
         }
         const posY = dir === "v-"
-        ? [posX[0] - (length-1), posX]
+        ? [posX[0] - (length-1), posX[1]]
         : dir === "v+"
         ? [posX[0] + (length-1), posX[1] ]
         : dir === "h-"
         ? [posX[0], posX[1] - (length-1) ]
         : dir === "h+"
         ? [posX[0], posX[1] + (length-1) ]
-        : !dir ? defaultShipDir()
         : new Error("Forgot ship direction parameter?")
         clog(posX)
         clog( checkPosition(posY) )
@@ -104,6 +104,7 @@ class GameBoard {
         const temp = []
         function SetOccupiedPositions() {
             if (posY[1] < posX[1]) {
+                clog("Case1")
                 for (let i = posX[1]; i >= posY[1] ; i-- ) {
                     temp.push([posX[0], i])
                 }
@@ -113,11 +114,25 @@ class GameBoard {
                     temp.push([posX[0], i])
                 }
             }
+            else if (posY[0] < posX[0]) {
+                for (let i = posX[0]; i >= posY[0] ; i-- ) {
+                    temp.push([i, posX[1]])
+                }
+            }
+            else if (posY[0] > posX[0]) {
+                for (let i = posX[0]; i <= posY[0] ; i++ ) {
+                    temp.push([i, posX[1]])
+                }
+            }
+            else if (posY[0] === posX[0] || posY[1] === posX[1]) {
+                    temp.push(posX)
+            }
             temp.push(ship)
         }
         SetOccupiedPositions()
         this.occupiedPositions.push(temp)
-        this.fleetLength = this.getFleetLength()
+        this.fleetLength += ship.length
+        // this.fleetLength = this.getFleetLength()
     }
 
     receiveAttack(coordinate) {
