@@ -1,6 +1,6 @@
 import { format } from "date-fns"
-import { clog, Ship, createGraphBfs, GameBoard, Player } from "./driver"
-
+import { clog, Ship, createGraphBfs, GameBoard, Player } from "./driver.js"
+clog("UI")
 // Code
 
 // UI game board
@@ -11,9 +11,10 @@ const p1GameBoardUi = document.querySelector(".p1-board-container")
 const p2GameBoardUi = document.querySelector(".p2-board-container")
 const gridNum = 10
 const boardWidth = 30
+const shipsAllowed = 5
 let player1
 let player2
-let shipsAllowed = 5
+
 
 // Function to handle true visual BFS graph squared game-board
 // Pre-required declarations: 
@@ -64,6 +65,7 @@ function generateBoardUI(boardContainer, gridNum, viewWidth) {
     generateBoardScales(xScale, yScale)
 }
 
+// function to generate scales based on gameBoard specs
 function generateBoardScales(xScaleDiv, yScaleDiv) {
     const gridTemplateCols = `
     display: grid;
@@ -89,9 +91,6 @@ function generateBoardScales(xScaleDiv, yScaleDiv) {
     }
 }
 
-// generateBoardUI(boardContainer, gridNum, boardWidth)
-clog(boardContainer)
-
 // Prepare to start game
 // Getting human player info
 function startGame(name) {
@@ -103,27 +102,7 @@ function startGame(name) {
     player2.gameBoard.op = player1
 }
 
-startGame("james")
-
-const ship1 = new Ship(4)
-const ship2 = new Ship(3)
-const ship3 = new Ship(5)
-const ship4 = new Ship(1)
-
-player1.gameBoard.placeShip(ship1, [3, 3], "h+")
-player1.gameBoard.placeShip(ship2, [0, 2], "v+")
-player2.gameBoard.placeShip(ship3, [9, 9], "v-")
-player2.gameBoard.placeShip(ship4, [4, 4], "h-")
-player1.gameBoard.sendAttack([9, 9])
-player1.gameBoard.sendAttack([8, 9])
-
-const p1Positions = player1.gameBoard.occupiedPositions
-const p2Positions = player2.gameBoard.occupiedPositions
-// const playersPositions = p1Positions.concat(p2Positions)
-const p1HitPositions = player2.gameBoard.successfulShots
-const p2HitPositions = player1.gameBoard.successfulShots
-// const playersHitPositions = p1HitPositions.concat(p2HitPositions)
-
+// Handling GameBoard (ships) occupied slots
 function occupiedSlotsUI(containerClassName, occupiedPositions) {
     for (let pos in occupiedPositions) {
         const slots = occupiedPositions[pos].slice(0, -1)
@@ -136,6 +115,7 @@ function occupiedSlotsUI(containerClassName, occupiedPositions) {
     }
 }
 
+// Handling GameBoard hit slots
 function hitSlotsUI(containerClassName, hitPositions) {
     for (let hit in hitPositions) {
         const hitSlot = hitPositions[hit]
@@ -148,13 +128,40 @@ function hitSlotsUI(containerClassName, hitPositions) {
 }
 
 // Rendering UI
-generateBoardUI(p1GameBoardUi, gridNum, boardWidth)
-generateBoardUI(p2GameBoardUi, gridNum, boardWidth)
-occupiedSlotsUI("p1-board-container", p1Positions)
-occupiedSlotsUI("p2-board-container", p2Positions)
-hitSlotsUI("p1-board-container", p1HitPositions)
-hitSlotsUI("p2-board-container", p2HitPositions)
+startGame("james")
+const p1Positions = player1.gameBoard.occupiedPositions
+const p2Positions = player2.gameBoard.occupiedPositions
+// const playersPositions = p1Positions.concat(p2Positions)
+const p1HitPositions = player2.gameBoard.successfulShots
+const p2HitPositions = player1.gameBoard.successfulShots
+// const playersHitPositions = p1HitPositions.concat(p2HitPositions)
 
+const ship1 = new Ship(4)
+const ship2 = new Ship(3)
+const ship3 = new Ship(5)
+const ship4 = new Ship(1)
+
+player1.gameBoard.placeShip(ship1, [3, 3], "h+")
+player1.gameBoard.placeShip(ship2, [0, 2], "v+")
+player2.gameBoard.placeShip(ship3, [9, 9], "v-")
+player2.gameBoard.placeShip(ship4, [4, 4], "h-")
+/*
+player1.gameBoard.sendAttack([9, 9])
+player1.gameBoard.sendAttack([8, 9]) */
+
+function renderUI() {
+    generateBoardUI(p1GameBoardUi, gridNum, boardWidth)
+    generateBoardUI(p2GameBoardUi, gridNum, boardWidth)
+    occupiedSlotsUI("p1-board-container", p1Positions)
+    occupiedSlotsUI("p2-board-container", p2Positions)
+    hitSlotsUI("p1-board-container", p1HitPositions)
+    hitSlotsUI("p2-board-container", p2HitPositions)
+}
+renderUI()
 
 // Exports
-export { generateBoardUI, generateBoardScales, gridNum, boardWidth, shipsAllowed, player1, player2 }
+export { 
+    generateBoardUI, generateBoardScales, 
+    gridNum, boardWidth, shipsAllowed, 
+    player1, player2, startGame, renderUI
+}

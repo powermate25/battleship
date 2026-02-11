@@ -44,6 +44,7 @@ class GameBoard {
         this.missedShots = []
         this.successfulShots = []
         this.alertMessage = undefined
+        this.notification = undefined
         this.fleetLength = 0
         // this.fleetLength = this.getFleetLength()
         
@@ -165,17 +166,25 @@ class GameBoard {
         clog(isDuplicate)
         if (isDuplicate) {
             confirm("Dev info: can't shot same area twice!")
+            this.notification = "Dev info: can't shot same area twice!"
             return
         }
 
         //if two players P1 & P2: 
         // P1.op should be P2 and vice versa
+        const opGameBoard = this.op.gameBoard
         this.op.gameBoard.receiveAttack(coordinate)
         const successAlert = "Nice shot! they're hit and struggling! 🎉"
         const failureAlert = "Missed! We're going to sink first at this rate! 😭" 
         const attackResult = this.alertMessage
-        if ( attackResult ) { clog(successAlert) }
-        else { clog(failureAlert) }
+        if ( attackResult ) {
+            clog(successAlert)
+            this.notification = successAlert
+        }
+        else {
+            clog(failureAlert)
+            this.notification = failureAlert
+        }
     }
     // Next step: 
     // sendAttack method. constructor(coor, ship) 
@@ -199,9 +208,6 @@ class GameBoard {
                 this.op.gameBoard.missedShots.push(coordinate)
                 this.op.gameBoard.alertMessage = false
             }
-            
-            clog("🔔 Board summary below: ")
-            clog(this)
         }
 }
 

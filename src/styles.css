@@ -50,7 +50,7 @@ div {
 .x-scale, .y-scale {
     place-items: center;
     font-weight: bold;
-    color: oklch(60.6% 0.17 162.48);
+    color: oklch(20.2% 0.056 229.695);
     font-size: 1rem;
 }
 .main-container .occupied-slots {
