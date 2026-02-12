@@ -165,7 +165,7 @@ class GameBoard {
         })
         clog(isDuplicate)
         if (isDuplicate) {
-            confirm("Dev info: can't shot same area twice!")
+            // confirm("Dev info: can't shoot same area twice!")
             this.notification = "Dev info: can't shot same area twice!"
             return
         }
@@ -198,8 +198,19 @@ class GameBoard {
                 this.op.gameBoard.successfulShots.push(coordinate)
                 this.op.gameBoard.alertMessage = true
             }
-            if ( this.hits >= this.fleetLength ) {
+            if ( this.successfulShots.length 
+                >= this.op.gameBoard.fleetLength 
+            ) {
+                // Will fix this case next time. using ship length
+                clog("📢 We won! their last ship just gone! 🎉")
+                clog("case1")
+                confirm("🔔 Dev info: Game should be over now.")
+            }
+            else if ( this.op.gameBoard.successfulShots.length 
+                >= this.fleetLength 
+            ) {
                 clog("🤕 Hell, we lost! Our last ship just gone!")
+                clog("case2")
                 confirm("🔔 Dev info: Game should be over now.")
             }
             else if (!report) {

@@ -60,3 +60,16 @@ div {
 .main-container .hit-slots {
     background-color: oklch(63.7% 0.237 25.331);
 }
+.main-container .missed-hit-slots {
+    background-color: oklch(97.15% 0.01675 231.15);
+}
+
+.notification-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 2rem;
+    border: 1px solid red;
+    padding: 0 1rem;
+    margin: 1rem;
+}

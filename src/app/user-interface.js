@@ -127,6 +127,18 @@ function hitSlotsUI(containerClassName, hitPositions) {
     }
 }
 
+// Handling GameBoard failed hit slots
+function failedHitSlotsUI(containerClassName, failedHitPositions) {
+    for (let hit in failedHitPositions) {
+        const missedHitSlot = failedHitPositions[hit]
+        const missedHitDiv = document.querySelector(
+            `.${containerClassName} .arr${missedHitSlot.join("-")}`
+        )
+        missedHitDiv.classList.add("missed-hit-slots")
+        clog(missedHitDiv)
+    }
+}
+
 // Rendering UI
 startGame("james")
 const p1Positions = player1.gameBoard.occupiedPositions
@@ -135,6 +147,8 @@ const p2Positions = player2.gameBoard.occupiedPositions
 const p1HitPositions = player2.gameBoard.successfulShots
 const p2HitPositions = player1.gameBoard.successfulShots
 // const playersHitPositions = p1HitPositions.concat(p2HitPositions)
+const p1FailedHitPositions = player2.gameBoard.missedShots
+const p2FailedHitPositions = player1.gameBoard.missedShots
 
 const ship1 = new Ship(4)
 const ship2 = new Ship(3)
@@ -156,9 +170,13 @@ function renderUI() {
     occupiedSlotsUI("p2-board-container", p2Positions)
     hitSlotsUI("p1-board-container", p1HitPositions)
     hitSlotsUI("p2-board-container", p2HitPositions)
+    failedHitSlotsUI("p1-board-container", p1FailedHitPositions)
+    failedHitSlotsUI("p2-board-container", p2FailedHitPositions)
+    
 }
 renderUI()
 
+clog(p1GameBoardUi)
 // Exports
 export { 
     generateBoardUI, generateBoardScales, 
