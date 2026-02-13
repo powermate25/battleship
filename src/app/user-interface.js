@@ -135,7 +135,6 @@ function failedHitSlotsUI(containerClassName, failedHitPositions) {
             `.${containerClassName} .arr${missedHitSlot.join("-")}`
         )
         missedHitDiv.classList.add("missed-hit-slots")
-        clog(missedHitDiv)
     }
 }
 
@@ -155,8 +154,13 @@ const ship2 = new Ship(3)
 const ship3 = new Ship(5)
 const ship4 = new Ship(1)
 
-player1.gameBoard.placeShip(ship1, [3, 3], "h+")
-player1.gameBoard.placeShip(ship2, [0, 2], "v+")
+/* player1.gameBoard.placeShip(ship1, [3, 3], "h+")
+player1.gameBoard.placeShip(ship2, [0, 2], "v+") */
+
+const tempShip = new Ship(2)
+player1.gameBoard.placeShip(tempShip, [9, 0], "h+")
+
+
 player2.gameBoard.placeShip(ship3, [9, 9], "v-")
 player2.gameBoard.placeShip(ship4, [4, 4], "h-")
 /*

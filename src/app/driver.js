@@ -204,14 +204,14 @@ class GameBoard {
                 // Will fix this case next time. using ship length
                 clog("📢 We won! their last ship just gone! 🎉")
                 clog("case1")
-                confirm("🔔 Dev info: Game should be over now.")
+                // confirm("🔔 Dev info: Game should be over now.")
             }
             else if ( this.op.gameBoard.successfulShots.length 
                 >= this.fleetLength 
             ) {
                 clog("🤕 Hell, we lost! Our last ship just gone!")
                 clog("case2")
-                confirm("🔔 Dev info: Game should be over now.")
+                // confirm("🔔 Dev info: Game should be over now.")
             }
             else if (!report) {
                 clog("📢 They're blind! Now our chance!")

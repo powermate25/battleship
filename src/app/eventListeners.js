@@ -21,12 +21,34 @@ function prepareCoordinate(targetClassName) {
     return coor
 }
 
+// Logic to detect winner
+function weGotWinner() {
+    const p1GoodShots = player1.gameBoard.successfulShots
+    const p1FleetLength = player1.gameBoard.fleetLength
+    const p2GoodShots = player2.gameBoard.successfulShots
+    const p2FleetLength = player2.gameBoard.fleetLength
+    if (p1GoodShots.length >= p2FleetLength) {
+        whosTurnNow = ""
+        alert(`${player1.name} is the winner ! 🎉`)
+        return true
+    }
+    else if (p2GoodShots.length >= p1FleetLength) {
+        whosTurnNow = ""
+        alert(`You're defeated! 😭${player2.name} (CPU) won. 🎉`
+        )
+        return false
+    }
+    else {clog("🔔 No winner yet!")}
+}
+
 // Logic to launch attack using prepared coordinate
 function launchAttack(coordinate, player) {
+    if( weGotWinner() ) {return}
     if(whosTurnNow !== player.type) {
         clog("⛔ Not you turn!")
         return
     }
+    
     const divClass = player.type
     === "human" ? ".user-notification"
     : player.type === "cpu" ? ".cpu-notification"
@@ -47,6 +69,9 @@ function launchAttack(coordinate, player) {
     p1Board.textContent = ""
     p2Board.textContent = ""
     renderUI()
+    setTimeout(() => {
+        weGotWinner()
+    }, 500);
     if (whosTurnNow === "cpu") {
         // 1 seconde timeout before cpu's auto response
         setTimeout( () => {
@@ -64,14 +89,14 @@ function getRandomCpuMove() {
         let fixedIndex = Math.floor(rawIndex)
         fixedIndex = fixedIndex 
         === 100 ? 99 : fixedIndex
-        clog(`c${fixedIndex}`)
+        //clog(`c${fixedIndex}`)
         const userBoard = document.querySelector(
             `.p1-board-container .gameboard #c${fixedIndex}`
         )
-        clog( userBoard.className )
+        //clog( userBoard.className )
         const classNameStr = userBoard.className
         const coor = prepareCoordinate(classNameStr)
-        clog( coor )
+        //clog( coor )
         return coor
 }
 
@@ -82,15 +107,12 @@ function validCpuMove() {
     const cpuFailedShots = player2.gameBoard.missedShots
     const cpuSuccessfulShots = player2.gameBoard.successfulShots
     const cpuShotLog = cpuFailedShots.concat(cpuSuccessfulShots)
-    clog("🚨🚨📢")
-    clog(cpuShotLog)
     let isValidCoor = undefined
     let coor
+    let loopCount = 0
     while (!isValidCoor) {
-        clog("🔄🔄🔄")
+        loopCount += 1
         coor = getRandomCpuMove()
-        clog("🔔🔔🔔")
-        clog(coor)
         for (let arr in cpuShotLog) {
             const curr = cpuShotLog[arr]
             if (coor.toString() === curr.toString() ) {
@@ -100,6 +122,7 @@ function validCpuMove() {
             else { isValidCoor = true }
         }
     }
+    clog(`🔄 Loop count: ${loopCount}`)
     return coor
 }
 
@@ -108,9 +131,7 @@ function cpuPrepareAttack() {
     if (whosTurnNow !== "cpu") {return}
     const coor = validCpuMove()
     launchAttack(coor, player2)
-    /* p1Board.textContent = ""
-    p2Board.textContent = ""
-    renderUI() */
+    // weGotWinner()
 }
 
 // Player1 event listeners.
@@ -161,15 +182,5 @@ p1Board.addEventListener("click", (e) => {
 })
 
 
-
-
-
-
-
-
 clog(player1)
 clog(player2)
-
-/* setTimeout( () => {
-    clog("TimeOut")
-}, 2000) */
