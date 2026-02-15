@@ -10,7 +10,7 @@ grid.addEventListener("click", (e) => {
 
 const p1Board = document.querySelector(".p1-board-container")
 const p2Board = document.querySelector(".p2-board-container")
-let whosTurnNow = "cpu"
+let whosTurnNow = "setup"
 
 // Logic to prepare coordinate from className
 function prepareCoordinate(targetClassName) {
@@ -28,12 +28,12 @@ function weGotWinner() {
     const p2GoodShots = player2.gameBoard.successfulShots
     const p2FleetLength = player2.gameBoard.fleetLength
     if (p1GoodShots.length >= p2FleetLength) {
-        whosTurnNow = ""
+        whosTurnNow = "setup"
         alert(`${player1.name} is the winner ! 🎉`)
         return true
     }
     else if (p2GoodShots.length >= p1FleetLength) {
-        whosTurnNow = ""
+        whosTurnNow = "setup"
         alert(`You're defeated! 😭${player2.name} (CPU) won. 🎉`
         )
         return false
@@ -182,5 +182,94 @@ p1Board.addEventListener("click", (e) => {
 })
 
 
+// Battleship setup mode
+let indexA = undefined
+let indexB = undefined
+
+// Handling ship starting index
+p1Board.addEventListener("mousedown", (e) => {
+    if (whosTurnNow === "setup" && !indexA && !indexB) {
+        e.preventDefault()
+        clog("Setup mode: A")
+        const classNameStr = e.target.className
+        const coor = prepareCoordinate(classNameStr)
+        clog(coor)
+        indexA = coor
+    }
+})
+
+// Handling ending index (case 1: mouse leave grid area)
+p1Board.addEventListener("mouseup", (e) => {
+    if (whosTurnNow === "setup" && indexA) {
+        e.preventDefault()
+        clog("Setup mode: B")
+        const classNameStr = e.target.className
+        const coor = prepareCoordinate(classNameStr)
+        clog(coor)
+        indexB = coor
+        /* p1Board.textContent = ""
+        p2Board.textContent = ""
+        renderUI() */ 
+        placeShipUI(player1)
+    }
+})
+
+// Handling ending index (case 1: mouse leave grid area)
+/* p1Board.addEventListener("mouseout", (e) => {
+    if (whosTurnNow === "setup" && indexA) {
+        e.preventDefault()
+        clog("Setup mode: B")
+        const classNameStr = e.target.className
+        const coor = prepareCoordinate(classNameStr)
+        clog(coor)
+        indexB = coor
+        //placeShipUI(player1)
+        
+    }
+}) */
+
+function placeShipUI(player) {
+    const boardLimit = gridNum-1
+    const shipLimit = player.gameBoard.occupiedPositions.length
+    if(shipLimit > shipsAllowed) {
+        clog("Max ship limit reached!")
+        return
+    }
+    
+    let newLength = 1
+    let dir
+    if (indexA && indexB) {
+        if (indexA[0] !== indexB[0]) {
+            clog("Vertical")
+            const tempLength = indexA[0] - indexB[0]
+            newLength += Math.abs(tempLength)
+            clog(newLength)
+            const newShip = new Ship(newLength)
+            dir = indexA[0] > indexB[0] ? "v-"
+            : indexA[0] < indexB[0] ? "v+"
+            : "v+"
+            player.gameBoard.placeShip(newShip, indexA, dir)
+        }
+        else if (indexA[0] === indexB[0]) {
+            clog("Horizontal")
+            const tempLength = indexA[1] - indexB[1]
+            newLength += Math.abs(tempLength)
+            clog(newLength)
+            const newShip = new Ship(newLength)
+            dir = indexA[1] > indexB[1] ? "h-"
+            : indexA[1] < indexB[1] ? "h+"
+            : "h+"
+            player.gameBoard.placeShip(newShip, indexA, dir)
+        }
+    }
+    indexA = undefined
+    indexB = undefined
+    p1Board.textContent = ""
+    p2Board.textContent = ""
+    renderUI()
+    clog(player1)
+}
+
 clog(player1)
 clog(player2)
+//clog( placeShipUI(player1, 4, [9, 0], "v+") )
