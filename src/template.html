@@ -4,7 +4,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Battleship</title>
     <body>
-        <h1>Battleship</h1>
+        <header class="header-container">
+            <h1>Battleship</h1>
+            <h3 class="user-name"></h3>
+            <button class="setup-button">Enter Setup</button>
+        </header>
+        
         <div class="notification-header">
             <div class="user-notification"></div>
             <div class="cpu-notification"></div>
@@ -22,15 +27,11 @@
                 <form method="dialog">
                     <fieldset>
                         <p class="left">
-                            <label for="length">Ship</label>
-                            <input type="number" name="ship_length" id="length" placeholder="Length">
-                        </p>
-                        <p class="right">
-                            <label for="dir">Orientation</label>
-                            <input type="number" name="ship_dir" id="dir" placeholder="Vertical">
+                            <label for="username">Player Name</label>
+                            <input type="text" name="user_name" id="username" placeholder="Your username">
                         </p>
                     </fieldset>
-                    <button type="submit">Place Ship</button>
+                    <button class="finish-setup-button" type="submit">Finish Setup</button>
             </form>
         </div>
     </body>

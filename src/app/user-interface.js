@@ -93,13 +93,20 @@ function generateBoardScales(xScaleDiv, yScaleDiv) {
 
 // Prepare to start game
 // Getting human player info
-function startGame(name) {
+function initializeGame(name) {
     const formattedName = name.charAt(0)
     .toUpperCase() + name.slice(1)
+    const userNameDiv = document.querySelector(".user-name")
+    userNameDiv.textContent = formattedName
     player1 = new Player(formattedName, "human", shipsAllowed)
     player2 = new Player("Alex", "cpu", shipsAllowed)
     player1.gameBoard.op = player2
     player2.gameBoard.op = player1
+
+    const ship3 = new Ship(5)
+    const ship4 = new Ship(1)
+    player2.gameBoard.placeShip(ship3, [9, 9], "v-")
+    player2.gameBoard.placeShip(ship4, [4, 4], "h-")
 }
 
 // Handling GameBoard (ships) occupied slots
@@ -139,51 +146,12 @@ function failedHitSlotsUI(containerClassName, failedHitPositions) {
 }
 
 // Rendering UI
-startGame("james")
-const p1Positions = player1.gameBoard.occupiedPositions
-const p2Positions = player2.gameBoard.occupiedPositions
-// const playersPositions = p1Positions.concat(p2Positions)
-const p1HitPositions = player2.gameBoard.successfulShots
-const p2HitPositions = player1.gameBoard.successfulShots
-// const playersHitPositions = p1HitPositions.concat(p2HitPositions)
-const p1FailedHitPositions = player2.gameBoard.missedShots
-const p2FailedHitPositions = player1.gameBoard.missedShots
 
-const ship1 = new Ship(4)
-const ship2 = new Ship(3)
-const ship3 = new Ship(5)
-const ship4 = new Ship(1)
-
-/* player1.gameBoard.placeShip(ship1, [3, 3], "h+")
-player1.gameBoard.placeShip(ship2, [0, 2], "v+") */
-
-const tempShip = new Ship(2)
-player1.gameBoard.placeShip(tempShip, [9, 0], "h+")
-
-
-player2.gameBoard.placeShip(ship3, [9, 9], "v-")
-player2.gameBoard.placeShip(ship4, [4, 4], "h-")
-/*
-player1.gameBoard.sendAttack([9, 9])
-player1.gameBoard.sendAttack([8, 9]) */
-
-function renderUI() {
-    generateBoardUI(p1GameBoardUi, gridNum, boardWidth)
-    generateBoardUI(p2GameBoardUi, gridNum, boardWidth)
-    occupiedSlotsUI("p1-board-container", p1Positions)
-    occupiedSlotsUI("p2-board-container", p2Positions)
-    hitSlotsUI("p1-board-container", p1HitPositions)
-    hitSlotsUI("p2-board-container", p2HitPositions)
-    failedHitSlotsUI("p1-board-container", p1FailedHitPositions)
-    failedHitSlotsUI("p2-board-container", p2FailedHitPositions)
-    
-}
-renderUI()
 
 clog(p1GameBoardUi)
 // Exports
 export { 
-    generateBoardUI, generateBoardScales, 
-    gridNum, boardWidth, shipsAllowed, 
-    player1, player2, startGame, renderUI
+    generateBoardUI, generateBoardScales, occupiedSlotsUI, 
+    hitSlotsUI, failedHitSlotsUI, gridNum, boardWidth, shipsAllowed, 
+    player1, player2, initializeGame
 }

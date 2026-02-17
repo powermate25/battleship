@@ -1,5 +1,5 @@
 import { clog, Ship, createGraphBfs, GameBoard, Player } from "./driver.js"
-import { generateBoardUI, generateBoardScales, gridNum, boardWidth, shipsAllowed, player1, player2, startGame, renderUI } from "./user-interface.js"
+import { generateBoardUI, generateBoardScales, occupiedSlotsUI, hitSlotsUI, failedHitSlotsUI, gridNum, boardWidth, shipsAllowed, player1, player2, initializeGame } from "./user-interface.js"
 clog("Events")
 
 // Code
@@ -10,7 +10,19 @@ grid.addEventListener("click", (e) => {
 
 const p1Board = document.querySelector(".p1-board-container")
 const p2Board = document.querySelector(".p2-board-container")
-let whosTurnNow = "setup"
+const setP1NameDiv = document.querySelector("form input[id=username]")
+const userHeaderTitleDiv = document.querySelector(".user-name")
+const setupButton = document.querySelector(".setup-button")
+const closeSetupBtn = document.querySelector(".finish-setup-button")
+const settingContainer = document.querySelector(".setting-container")
+
+let userName = "Guest"
+let whosTurnNow = "cpu"
+let setupMode = false
+if(!setupMode) {clog("false")}
+settingContainer.style.display = "none"
+
+//setP1NameDiv.textContent = "test"
 
 // Logic to prepare coordinate from className
 function prepareCoordinate(targetClassName) {
@@ -23,17 +35,21 @@ function prepareCoordinate(targetClassName) {
 
 // Logic to detect winner
 function weGotWinner() {
+    if(setupMode) {
+        clog("⚙ currently in setup")
+        return
+    }
     const p1GoodShots = player1.gameBoard.successfulShots
     const p1FleetLength = player1.gameBoard.fleetLength
     const p2GoodShots = player2.gameBoard.successfulShots
     const p2FleetLength = player2.gameBoard.fleetLength
     if (p1GoodShots.length >= p2FleetLength) {
-        whosTurnNow = "setup"
+        whosTurnNow = "game-over"
         alert(`${player1.name} is the winner ! 🎉`)
         return true
     }
     else if (p2GoodShots.length >= p1FleetLength) {
-        whosTurnNow = "setup"
+        whosTurnNow = "game-over"
         alert(`You're defeated! 😭${player2.name} (CPU) won. 🎉`
         )
         return false
@@ -43,6 +59,10 @@ function weGotWinner() {
 
 // Logic to launch attack using prepared coordinate
 function launchAttack(coordinate, player) {
+    if(setupMode) {
+        clog("⚙ currently in setup")
+        return
+    }
     if( weGotWinner() ) {return}
     if(whosTurnNow !== player.type) {
         clog("⛔ Not you turn!")
@@ -185,10 +205,32 @@ p1Board.addEventListener("click", (e) => {
 // Battleship setup mode
 let indexA = undefined
 let indexB = undefined
+setP1NameDiv.value = userName
+setupButton.addEventListener("click", () => {
+    enableSetupMode(true)
+    settingContainer.style.display = ""
+})
+
+closeSetupBtn.addEventListener("click", () => {
+    enableSetupMode(false)
+    settingContainer.style.display = "none"
+    userName = setP1NameDiv.value
+    userHeaderTitleDiv.textContent = userName
+})
+
+function enableSetupMode (trueFalse) {
+    setupMode = trueFalse
+    if(setupMode) {
+        settingContainer.style.display = ""
+    }
+}
+
+
+enableSetupMode(true)
 
 // Handling ship starting index
 p1Board.addEventListener("mousedown", (e) => {
-    if (whosTurnNow === "setup" && !indexA && !indexB) {
+    if (setupMode && !indexA && !indexB) {
         e.preventDefault()
         clog("Setup mode: A")
         const classNameStr = e.target.className
@@ -200,7 +242,7 @@ p1Board.addEventListener("mousedown", (e) => {
 
 // Handling ending index (case 1: mouse leave grid area)
 p1Board.addEventListener("mouseup", (e) => {
-    if (whosTurnNow === "setup" && indexA) {
+    if (setupMode && indexA) {
         e.preventDefault()
         clog("Setup mode: B")
         const classNameStr = e.target.className
@@ -231,7 +273,8 @@ p1Board.addEventListener("mouseup", (e) => {
 function placeShipUI(player) {
     const boardLimit = gridNum-1
     const shipLimit = player.gameBoard.occupiedPositions.length
-    if(shipLimit > shipsAllowed) {
+    if(shipLimit >= shipsAllowed) {
+        clog(player)
         clog("Max ship limit reached!")
         return
     }
@@ -270,6 +313,45 @@ function placeShipUI(player) {
     clog(player1)
 }
 
+// Rendering UI
+initializeGame(userName)
+function startGame() {
+
+}
+const p1Positions = player1.gameBoard.occupiedPositions
+const p2Positions = player2.gameBoard.occupiedPositions
+// const playersPositions = p1Positions.concat(p2Positions)
+const p1HitPositions = player2.gameBoard.successfulShots
+const p2HitPositions = player1.gameBoard.successfulShots
+// const playersHitPositions = p1HitPositions.concat(p2HitPositions)
+const p1FailedHitPositions = player2.gameBoard.missedShots
+const p2FailedHitPositions = player1.gameBoard.missedShots
+
+/* const ship1 = new Ship(4)
+const ship2 = new Ship(3) */
+const ship3 = new Ship(5)
+const ship4 = new Ship(1)
+
+const tempShip = new Ship(2)
+/* player1.gameBoard.placeShip(tempShip, [9, 0], "h+") */
+
+player2.gameBoard.placeShip(ship3, [9, 9], "v-")
+player2.gameBoard.placeShip(ship4, [4, 4], "h-")
+
+function renderUI() {
+    generateBoardUI(p1Board, gridNum, boardWidth)
+    generateBoardUI(p2Board, gridNum, boardWidth)
+    occupiedSlotsUI("p1-board-container", p1Positions)
+    occupiedSlotsUI("p2-board-container", p2Positions)
+    hitSlotsUI("p1-board-container", p1HitPositions)
+    hitSlotsUI("p2-board-container", p2HitPositions)
+    failedHitSlotsUI("p1-board-container", p1FailedHitPositions)
+    failedHitSlotsUI("p2-board-container", p2FailedHitPositions)
+    
+}
+renderUI()
+
+//
 clog(player1)
 clog(player2)
 //clog( placeShipUI(player1, 4, [9, 0], "v+") )
