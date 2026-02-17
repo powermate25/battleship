@@ -52,9 +52,14 @@ function weGotWinner() {
         whosTurnNow = "game-over"
         alert(`You're defeated! 😭${player2.name} (CPU) won. 🎉`
         )
+        return true
+    }
+    else {
+        clog("🔔 No winner yet!")
+        clog(p1FleetLength)
+        clog(p2FleetLength)
         return false
     }
-    else {clog("🔔 No winner yet!")}
 }
 
 // Logic to launch attack using prepared coordinate
@@ -329,14 +334,14 @@ const p2FailedHitPositions = player1.gameBoard.missedShots
 
 /* const ship1 = new Ship(4)
 const ship2 = new Ship(3) */
-const ship3 = new Ship(5)
-const ship4 = new Ship(1)
 
-const tempShip = new Ship(2)
+/* const tempShip = new Ship(2) */
 /* player1.gameBoard.placeShip(tempShip, [9, 0], "h+") */
 
+/* const ship3 = new Ship(5)
+const ship4 = new Ship(1)
 player2.gameBoard.placeShip(ship3, [9, 9], "v-")
-player2.gameBoard.placeShip(ship4, [4, 4], "h-")
+player2.gameBoard.placeShip(ship4, [4, 4], "h-") */
 
 function renderUI() {
     generateBoardUI(p1Board, gridNum, boardWidth)

@@ -130,7 +130,7 @@ function hitSlotsUI(containerClassName, hitPositions) {
             `.${containerClassName} .arr${hitSlot.join("-")}`
         )
         hitDiv.classList.add("hit-slots")
-        clog(hitDiv)
+        // clog(hitDiv)
     }
 }
 
