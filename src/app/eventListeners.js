@@ -1,5 +1,5 @@
 import { clog, Ship, createGraphBfs, GameBoard, Player } from "./driver.js"
-import { generateBoardUI, generateBoardScales, occupiedSlotsUI, hitSlotsUI, failedHitSlotsUI, gridNum, boardWidth, shipsAllowed, player1, player2, initializeGame } from "./user-interface.js"
+import { generateBoardUI, generateBoardScales, occupiedSlotsUI, hitSlotsUI, failedHitSlotsUI, gridNum, boardWidth, shipsAllowed } from "./user-interface.js"
 clog("Events")
 
 // Code
@@ -15,14 +15,74 @@ const userHeaderTitleDiv = document.querySelector(".user-name")
 const setupButton = document.querySelector(".setup-button")
 const closeSetupBtn = document.querySelector(".finish-setup-button")
 const settingContainer = document.querySelector(".setting-container")
+const p1Notification = document.querySelector(".user-notification")
+const p2Notification = document.querySelector(".cpu-notification")
 
+let player1
+let player2
 let userName = "Guest"
 let whosTurnNow = "cpu"
 let setupMode = false
-if(!setupMode) {clog("false")}
-settingContainer.style.display = "none"
 
-//setP1NameDiv.textContent = "test"
+function initializeGame(name) {
+    const formattedName = name.charAt(0)
+    .toUpperCase() + name.slice(1)
+    const userNameDiv = document.querySelector(".user-name")
+    userNameDiv.textContent = formattedName
+    player1 = new Player(formattedName, "human", shipsAllowed)
+    player2 = new Player("Alex", "cpu", shipsAllowed)
+    player1.gameBoard.op = player2
+    player2.gameBoard.op = player1
+    const ship3 = new Ship(5)
+    const ship4 = new Ship(1)
+    player2.gameBoard.placeShip(ship3, [9, 9], "v-")
+    player2.gameBoard.placeShip(ship4, [4, 4], "h-")
+    renderUI()  
+}
+initializeGame(userName)
+
+setP1NameDiv.value = userName
+setupButton.addEventListener("click", () => {
+    confirm("Reset game and enter setup mode?")
+    initializeGame(userName)
+    enableSetupMode(true)
+    settingContainer.style.display = ""
+})
+
+function isDonePlacingShip() {
+    let answer = true
+    const currLength = player1.gameBoard
+    .occupiedPositions
+    .length
+    const result = shipsAllowed - currLength
+    const shipStr = result === 1
+    ? "ship" : "ships"
+    if (currLength < shipsAllowed) {
+        answer = false
+        alert(`Please place ${result} more ${shipStr}`)
+    }
+    return answer
+}
+
+closeSetupBtn.addEventListener("click", (e) => {
+    e.preventDefault()
+    if ( !isDonePlacingShip() ) {return}
+    enableSetupMode(false)
+    settingContainer.style.display = "none"
+    userName = setP1NameDiv.value
+    userHeaderTitleDiv.textContent = userName
+    player1.name = userName
+})
+
+function enableSetupMode (trueFalse) {
+    setupMode = trueFalse
+    if(setupMode) {
+        settingContainer.style.display = ""
+    }
+    p1Notification.textContent = ""
+    p2Notification.textContent = ""
+}
+enableSetupMode(true)
 
 // Logic to prepare coordinate from className
 function prepareCoordinate(targetClassName) {
@@ -201,38 +261,12 @@ p1Board.addEventListener("click", (e) => {
     const classNameStr = e.target.className
     const coor = prepareCoordinate(classNameStr)
     launchAttack(coor, player2)
-    /* p1Board.textContent = ""
-    p2Board.textContent = ""
-    renderUI() */
 })
 
 
 // Battleship setup mode
 let indexA = undefined
 let indexB = undefined
-setP1NameDiv.value = userName
-setupButton.addEventListener("click", () => {
-    enableSetupMode(true)
-    settingContainer.style.display = ""
-})
-
-closeSetupBtn.addEventListener("click", () => {
-    enableSetupMode(false)
-    settingContainer.style.display = "none"
-    userName = setP1NameDiv.value
-    userHeaderTitleDiv.textContent = userName
-})
-
-function enableSetupMode (trueFalse) {
-    setupMode = trueFalse
-    if(setupMode) {
-        settingContainer.style.display = ""
-    }
-}
-
-
-enableSetupMode(true)
-
 // Handling ship starting index
 p1Board.addEventListener("mousedown", (e) => {
     if (setupMode && !indexA && !indexB) {
@@ -254,9 +288,6 @@ p1Board.addEventListener("mouseup", (e) => {
         const coor = prepareCoordinate(classNameStr)
         clog(coor)
         indexB = coor
-        /* p1Board.textContent = ""
-        p2Board.textContent = ""
-        renderUI() */ 
         placeShipUI(player1)
     }
 })
@@ -312,38 +343,40 @@ function placeShipUI(player) {
     }
     indexA = undefined
     indexB = undefined
-    p1Board.textContent = ""
-    p2Board.textContent = ""
     renderUI()
-    clog(player1)
+    // clog(player1)
 }
 
 // Rendering UI
-initializeGame(userName)
+
 function startGame() {
 
 }
-const p1Positions = player1.gameBoard.occupiedPositions
-const p2Positions = player2.gameBoard.occupiedPositions
-// const playersPositions = p1Positions.concat(p2Positions)
-const p1HitPositions = player2.gameBoard.successfulShots
-const p2HitPositions = player1.gameBoard.successfulShots
-// const playersHitPositions = p1HitPositions.concat(p2HitPositions)
-const p1FailedHitPositions = player2.gameBoard.missedShots
-const p2FailedHitPositions = player1.gameBoard.missedShots
 
 /* const ship1 = new Ship(4)
 const ship2 = new Ship(3) */
+/* const ship3 = new Ship(5)
+const ship4 = new Ship(1) */
 
-/* const tempShip = new Ship(2) */
+const tempShip = new Ship(2)
 /* player1.gameBoard.placeShip(tempShip, [9, 0], "h+") */
 
-/* const ship3 = new Ship(5)
-const ship4 = new Ship(1)
-player2.gameBoard.placeShip(ship3, [9, 9], "v-")
+/* player2.gameBoard.placeShip(ship3, [9, 9], "v-")
 player2.gameBoard.placeShip(ship4, [4, 4], "h-") */
 
 function renderUI() {
+    const p1Positions = player1.gameBoard.occupiedPositions
+    const p2Positions = player2.gameBoard.occupiedPositions
+    // const playersPositions = p1Positions.concat(p2Positions)
+    const p1HitPositions = player2.gameBoard.successfulShots
+    const p2HitPositions = player1.gameBoard.successfulShots
+    // const playersHitPositions = p1HitPositions.concat(p2HitPositions)
+    const p1FailedHitPositions = player2.gameBoard.missedShots
+    const p2FailedHitPositions = player1.gameBoard.missedShots
+
+
+    p1Board.textContent = ""
+    p2Board.textContent = ""
     generateBoardUI(p1Board, gridNum, boardWidth)
     generateBoardUI(p2Board, gridNum, boardWidth)
     occupiedSlotsUI("p1-board-container", p1Positions)

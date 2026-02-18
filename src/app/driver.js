@@ -233,16 +233,16 @@ class Player {
 
 
 // Logs
-const player1 = new Player("Jack", "human")
-const player2 = new Player("Rose", "cpu")
+/* const player1 = new Player("Jack", "human")
+const player2 = new Player("Rose", "cpu") */
 
-const demoShip = new Ship(4)
+/* const demoShip = new Ship(4)
 const gameBoard = new GameBoard(10)
 
 gameBoard.placeShip(demoShip, [5, 3], "h+")
 gameBoard.placeShip(demoShip, [3, 4], "h-")
 clog(demoShip)
-clog(gameBoard)
+clog(gameBoard) */
 // clog(opShip)
 //clog(opGameBoard)
 

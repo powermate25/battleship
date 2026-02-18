@@ -12,8 +12,6 @@ const p2GameBoardUi = document.querySelector(".p2-board-container")
 const gridNum = 10
 const boardWidth = 30
 const shipsAllowed = 5
-let player1
-let player2
 
 
 // Function to handle true visual BFS graph squared game-board
@@ -93,21 +91,7 @@ function generateBoardScales(xScaleDiv, yScaleDiv) {
 
 // Prepare to start game
 // Getting human player info
-function initializeGame(name) {
-    const formattedName = name.charAt(0)
-    .toUpperCase() + name.slice(1)
-    const userNameDiv = document.querySelector(".user-name")
-    userNameDiv.textContent = formattedName
-    player1 = new Player(formattedName, "human", shipsAllowed)
-    player2 = new Player("Alex", "cpu", shipsAllowed)
-    player1.gameBoard.op = player2
-    player2.gameBoard.op = player1
 
-    const ship3 = new Ship(5)
-    const ship4 = new Ship(1)
-    player2.gameBoard.placeShip(ship3, [9, 9], "v-")
-    player2.gameBoard.placeShip(ship4, [4, 4], "h-")
-}
 
 // Handling GameBoard (ships) occupied slots
 function occupiedSlotsUI(containerClassName, occupiedPositions) {
@@ -147,11 +131,8 @@ function failedHitSlotsUI(containerClassName, failedHitPositions) {
 
 // Rendering UI
 
-
-clog(p1GameBoardUi)
 // Exports
 export { 
     generateBoardUI, generateBoardScales, occupiedSlotsUI, 
-    hitSlotsUI, failedHitSlotsUI, gridNum, boardWidth, shipsAllowed, 
-    player1, player2, initializeGame
+    hitSlotsUI, failedHitSlotsUI, gridNum, boardWidth, shipsAllowed
 }
