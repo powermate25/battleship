@@ -33,17 +33,23 @@ function initializeGame(name) {
     player2 = new Player("Alex", "cpu", shipsAllowed)
     player1.gameBoard.op = player2
     player2.gameBoard.op = player1
-    const ship3 = new Ship(5)
+    for (let x = 0; x < shipsAllowed; x++) {
+        cpuPlaceShips()
+    }
+    /* const ship3 = new Ship(5)
     const ship4 = new Ship(1)
     player2.gameBoard.placeShip(ship3, [9, 9], "v-")
-    player2.gameBoard.placeShip(ship4, [4, 4], "h-")
+    player2.gameBoard.placeShip(ship4, [4, 4], "h-") */
     renderUI()  
 }
 initializeGame(userName)
 
 setP1NameDiv.value = userName
 setupButton.addEventListener("click", () => {
-    confirm("Reset game and enter setup mode?")
+    const response = confirm(
+        "Reset game and enter setup mode?"
+    )
+    if (!response) {return}
     initializeGame(userName)
     enableSetupMode(true)
     settingContainer.style.display = ""
@@ -166,14 +172,153 @@ function launchAttack(coordinate, player) {
 }
 
 // Handling cpu automatic interactions
+// random cpu ships placement
+// Continue working below here cpu placements
+function cpuPlaceShips() {
+    const getRandomCoor = () => {
+        const corrector = Math.pow(gridNum, 2)
+        const rawIndex = Math.random()
+        .toFixed(2) * 100
+        let fixedIndex = Math.floor(rawIndex)
+        fixedIndex = fixedIndex 
+        >= corrector ? corrector - 1 : fixedIndex
+        let randomCoor = fixedIndex < 10 ? [0, fixedIndex]
+        : Array.from(fixedIndex.toString())
+        .map(i => Number(i) )
+        clog(randomCoor)
+        return randomCoor
+    }
+
+    const shipSlots = player2.gameBoard.occupiedPositions
+    let isValidCoor = undefined
+    let loopCount = 0
+    let coor
+    let tempCpuPositions
+    let orientation
+    let integer
+    let boardLimit = gridNum - 1
+    function getOrientation() {
+        integer = Math.random().toFixed(1) * 10
+        integer = Math.floor(integer)
+        clog(integer)
+        orientation = integer <= (gridNum/2)/2 
+    ? "v+" : integer <= (gridNum/2) ? "h-"
+    : integer >= (gridNum/2)+(gridNum/4) ? "v-"
+    : "h+"
+    clog("🔔 Orientation")
+    clog(orientation)
+    return orientation
+    }
+    const dir = getOrientation()
+
+    function validateRandomCoor() {
+        tempCpuPositions = []
+        while (!isValidCoor) {
+            loopCount += 1
+            coor = getRandomCoor()
+            if (!shipSlots[0]) {
+                clog("Bug Fix")
+                break
+            }
+            for (let i = 0; i < shipSlots.length; i++) {
+                const currSlot = shipSlots[i].slice(-1)
+            for (let arr in currSlot) {
+                    const curr = currSlot[arr]
+                    if (coor.toString() === curr.toString() ) {
+                        isValidCoor = false
+                        break
+                    }
+                    else { isValidCoor = true }
+                }
+                if(isValidCoor === false) { break}
+            } 
+        }
+        
+        let posX = coor
+        clog(posX)
+        if(dir === "h-") {
+            clog("📢 Case1: h-")
+            for (let x = 0; x <= posX[1]; x++) {
+                tempCpuPositions.push([posX[0], x])
+            }
+        }
+        else if (dir === "h+") {
+            clog("📢 Case2: h+")
+            for (let x = posX[1]; x <= boardLimit; x++) {
+                tempCpuPositions.push([posX[0], x])
+            }
+        }
+        else if (dir === "v-") {
+            clog("📢 Case3: v-")
+            for (let x = 0; x <= posX[0]; x++) {
+                tempCpuPositions.push([x, posX[1]])
+            }
+        }
+        else if (dir === "v+") {
+            clog("📢 Case4: v+")
+            for (let x = posX[0]; x <= boardLimit; x++) {
+                tempCpuPositions.push([x, posX[1]])
+            }
+        }
+        
+    }
+    validateRandomCoor()
+    
+    clog(`🔄 Logger: `)
+    clog(tempCpuPositions)
+    let validatedPos = []
+    let isDoneValidatingPos = false
+    let index = 0
+    if(!shipSlots[index]) {
+        validatedPos = tempCpuPositions
+    }
+    while (shipSlots[index]) {
+        const curr = shipSlots[index].slice(0, -1)
+        clog(curr)
+        for (let i = 0; i < curr.length; i++) {
+            const arr = curr[i]
+            for (let x in tempCpuPositions) {
+                const temp = tempCpuPositions[x]
+                if (temp.toString() === arr.toString()) {
+                    isDoneValidatingPos = false
+                    break
+                }
+                else {
+                    validatedPos.push(temp)
+                    validatedPos = [... new Set(validatedPos)]
+                }
+            }
+            if (isDoneValidatingPos) {break}
+        }
+        if(isDoneValidatingPos) {break}
+        index +=1
+        // Restart loop in worse case scenario where 
+        // no position might be available
+        if(isDoneValidatingPos && !validatedPos[0]) {
+            index = 0
+            validateRandomCoor()
+        }
+    } 
+    clog(validatedPos)
+    // Now ready to define ships
+    const shipLength = validatedPos.length - 1
+    const newShip = new Ship(shipLength)
+    player2.gameBoard.placeShip(newShip, coor, dir)
+}
+
+// Continue working above here cpu placements
+
 // Generate random cpu arr coordinate
 function getRandomCpuMove() {
+    const base = Math.pow(gridNum, 2)
+    const corrector = base - 1
+    clog(corrector)
     if (whosTurnNow !== "cpu") {return}
         const rawIndex = Math.random()
         .toFixed(2) * 100
         let fixedIndex = Math.floor(rawIndex)
         fixedIndex = fixedIndex 
-        === 100 ? 99 : fixedIndex
+        >= base ? corrector : fixedIndex
         //clog(`c${fixedIndex}`)
         const userBoard = document.querySelector(
             `.p1-board-container .gameboard #c${fixedIndex}`
@@ -344,7 +489,6 @@ function placeShipUI(player) {
     indexA = undefined
     indexB = undefined
     renderUI()
-    // clog(player1)
 }
 
 // Rendering UI
