@@ -30,6 +30,7 @@ body {
 }
 
 .gameboard div {
+    touch-action: none;
     border: 1px solid oklch(60.9% 30% 221.723);
     background-color: oklch(20.2% 0.056 229.695);
 }
@@ -59,9 +60,42 @@ div {
     color: oklch(20.2% 0.056 229.695);
     font-size: 1rem;
 }
+
+/* .setting-container {
+    border: 1px solid red;
+} */
+/* dialog, ::backdrop {
+    filter: blur(10px);
+} */
+
+dialog {
+    color: oklch(60.9% 30% 221.723);
+    border: 1px solid oklch(60.9% 30% 221.723);
+}
+
+dialog .dialog-close-button {
+    cursor: pointer;
+    margin: 0;
+    justify-self: end;
+    color: oklch(60.9% 30% 221.723);
+}
+
+::backdrop {
+    backdrop-filter: blur(5px);
+ }
+.setup-message {
+    margin: 0 1rem;
+    font-size: 1rem;
+}
+
 .main-container .occupied-slots {
     background-color: oklch(92.4% 60% 95.746);
 }
+
+/* .main-container .cpu-occupied-slots {
+    background-color: oklch(92.4% 60% 95.746);
+}
+ */
 
 .main-container .hit-slots {
     background-color: oklch(63.7% 0.237 25.331);

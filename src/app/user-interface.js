@@ -106,6 +106,18 @@ function occupiedSlotsUI(containerClassName, occupiedPositions) {
     }
 }
 
+function cpuOccupiedSlotsUI(containerClassName, occupiedPositions) {
+    for (let pos in occupiedPositions) {
+        const slots = occupiedPositions[pos].slice(0, -1)
+        slots.forEach(x => {
+            const occupiedSlot = document.querySelector(
+                `.${containerClassName} .arr${x.join("-")}`
+            )
+            occupiedSlot.classList.add("cpu-occupied-slots")
+        })
+    }
+}
+
 // Handling GameBoard hit slots
 function hitSlotsUI(containerClassName, hitPositions) {
     for (let hit in hitPositions) {
@@ -133,6 +145,6 @@ function failedHitSlotsUI(containerClassName, failedHitPositions) {
 
 // Exports
 export { 
-    generateBoardUI, generateBoardScales, occupiedSlotsUI, 
+    generateBoardUI, generateBoardScales, occupiedSlotsUI, cpuOccupiedSlotsUI, 
     hitSlotsUI, failedHitSlotsUI, gridNum, boardWidth, shipsAllowed
 }
